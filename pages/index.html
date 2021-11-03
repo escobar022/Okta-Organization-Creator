@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Auth0 Lab Organization Creator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 40px;
+        }
+
+        #input {
+            display: flex;
+            flex-direction: column;
+            margin: 50px 20%;
+        }
+
+        input {
+            margin: 10px 0;
+            padding: 5px;
+        }
+
+        .help {
+            color: darkgrey;
+            font-style: italic;
+        }
+
+        #submit {
+            margin: 0 20%;
+            padding: 20px;
+            font-size: 120%;
+            border-radius: 0px;
+            border: 0;
+        }
+        #data {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Welcome to the Organization Creator!</h1>
+    <p style="text-align: justify;">This tool was created in assistance to the <a href="http://lab.pizza0.net">Auth0 Multi-Tenant SaaS Lab</a> and
+        can provide you with an Enterprise Directory in order to test Auth0's organization feature. Enter all required
+        information below and click submit to create your directory!</p>
+    <section id="input">
+        <input id="tenant" type="text" placeholder="Auth0 Tenant Name">
+        <p class="help">This is the name you have specified when you created your Auth0 tenant. You can find it when
+            navigating to manage.auth0.com under manage.auth0.com/dashboard/eu/<b>tenant-name</b></p>
+        <input id="org" type="text" placeholder="Organization Name (can be anything)">
+        <input id="email" type="text" placeholder="Test Users Email address (can be any valid email address)">
+        <input id="first" type="text" placeholder="Users first name (optional)">
+        <input id="last" type="text" placeholder="Users last name (optional)">
+        <button id="submit" onclick="submit()">Create Organization</button>
+    </section>
+    <section id="data">
+        <table>
+            <tr>
+                <td>Client ID</td>
+                <td id="clientid"></td>
+            </tr>
+            <tr>
+                <td>Issuer URL</td>
+                <td id="issuer"></td>
+            </tr>
+            <tr>
+                <td>User email address</td>
+                <td id="mail"></td>
+            </tr>
+            <tr>
+                <td>User Password</td>
+                <td id="pw"></td>
+            </tr>
+        </table>
+    </section>
+    <script>
+        function submit() {
+            const tenant = document.querySelector("#tenant");
+            const org = document.querySelector("#org");
+            const email = document.querySelector("#email");
+            const first = document.querySelector("#first");
+            const last = document.querySelector("#last");
+            const submitBtn = document.querySelector("#submit");
+            const inputForm = document.querySelector("#input");
+
+            tenant.setAttribute("disabled","true");
+            org.setAttribute("disabled","true");
+            email.setAttribute("disabled","true");
+            first.setAttribute("disabled","true");
+            last.setAttribute("disabled","true");
+            submitBtn.setAttribute("disabled","true");
+            submitBtn.innerHTML = "Creating organization...";
+
+            fetch(`/signup?tenant=${tenant.value}&organization=${org.value}&email=${email.value}&first=${first.value}&last=${last.value}`).then(res => {
+                if(res.status === 200) {
+                    res.json().then(data => {
+                        inputForm.style.display = "none";
+
+                        document.querySelector("#data").style.display = "block";
+
+                        document.querySelector("#clientid").innerHTML = data.client_id;
+                        document.querySelector("#issuer").innerHTML = data.issuer_url;
+                        document.querySelector("#mail").innerHTML = data.user_mail;
+                        document.querySelector("#pw").innerHTML = data.user_pw;
+                    })
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>
