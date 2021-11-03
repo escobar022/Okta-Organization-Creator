@@ -111,4 +111,4 @@ function createPassword() {
   return result;
 }
 
-app.listen(3001, () => { console.log("Server running"); })
+app.listen(process.env.PORT || 3001, () => { console.log("Server running"); })
