@@ -33,7 +33,14 @@
             border-radius: 0px;
             border: 0;
         }
+
         #data {
+            display: none;
+        }
+
+        #errormsg {
+            background-color: lightcoral;
+            padding: 20px;
             display: none;
         }
     </style>
@@ -41,7 +48,8 @@
 
 <body>
     <h1>Welcome to the Organization Creator!</h1>
-    <p style="text-align: justify;">This tool was created in assistance to the <a href="http://lab.pizza0.net">Auth0 Multi-Tenant SaaS Lab</a> and
+    <p style="text-align: justify;">This tool was created in assistance to the <a href="http://lab.pizza0.net">Auth0
+            Multi-Tenant SaaS Lab</a> and
         can provide you with an Enterprise Directory in order to test Auth0's organization feature. Enter all required
         information below and click submit to create your directory!</p>
     <section id="input">
@@ -54,6 +62,8 @@
         <input id="last" type="text" placeholder="Users last name (optional)">
         <button id="submit" onclick="submit()">Create Organization</button>
     </section>
+    <div id="errormsg">Looks like something went wrong! Probably either the organization or user already exists in the
+        demo environment, try entering a different value and submit again!<br><br>Full error:<br><span id="error"></span></div>
     <section id="data">
         <table>
             <tr>
@@ -84,17 +94,18 @@
             const submitBtn = document.querySelector("#submit");
             const inputForm = document.querySelector("#input");
 
-            tenant.setAttribute("disabled","true");
-            org.setAttribute("disabled","true");
-            email.setAttribute("disabled","true");
-            first.setAttribute("disabled","true");
-            last.setAttribute("disabled","true");
-            submitBtn.setAttribute("disabled","true");
+            tenant.setAttribute("disabled", "true");
+            org.setAttribute("disabled", "true");
+            email.setAttribute("disabled", "true");
+            first.setAttribute("disabled", "true");
+            last.setAttribute("disabled", "true");
+            submitBtn.setAttribute("disabled", "true");
             submitBtn.innerHTML = "Creating organization...";
 
             fetch(`/signup?tenant=${tenant.value}&organization=${org.value}&email=${email.value}&first=${first.value}&last=${last.value}`).then(res => {
-                if(res.status === 200) {
+                if (res.status === 200) {
                     res.json().then(data => {
+                        document.querySelector("#errormsg").style.display = "none";
                         inputForm.style.display = "none";
 
                         document.querySelector("#data").style.display = "block";
@@ -103,6 +114,19 @@
                         document.querySelector("#issuer").innerHTML = data.issuer_url;
                         document.querySelector("#mail").innerHTML = data.user_mail;
                         document.querySelector("#pw").innerHTML = data.user_pw;
+                    })
+                }
+                else {
+                    res.text().then(msg => {
+                        document.querySelector("#errormsg").style.display = "block";
+                        document.querySelector("#error").innerHTML = msg;
+                        tenant.removeAttribute("disabled");
+                        email.removeAttribute("disabled");
+                        first.removeAttribute("disabled");
+                        last.removeAttribute("disabled");
+                        org.removeAttribute("disabled");
+                        submitBtn.removeAttribute("disabled");
+                        submitBtn.innerHTML = "Create Organization";
                     })
                 }
             })

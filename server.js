@@ -4,13 +4,14 @@ const env = require("dotenv");
 const path = require("path");
 env.config();
 const okta = require('@okta/okta-sdk-nodejs');
+const { application } = require("express");
 
 const client = new okta.Client({
   orgUrl: process.env.ORGANIZATION,
   token: process.env.TOKEN    // Obtained from Developer Dashboard
 });
 
-app.get("/", (req,res) => {
+app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "pages", "index.html"));
 })
 
@@ -86,16 +87,46 @@ app.get("/signup", (req, res) => {
                     user_mail: req.query.email,
                     user_pw: password
                   })
+                }).catch(e => {
+                  try {
+                    console.error(e);
+                    user.deactivate().then(() => user.delete().then(() => {
+                      client.deleteGroup(group.id).then(() => {
+                        res.status(500).send("Application couldn't be created (Probably already exists). Full error: " + e);
+                      })
+                    }))
+                  }
+                  catch (e) {
+                    res.status(500).send("Unknown error: " + e);
+                  }
                 });
+            }).catch(e => {
+              try {
+                console.error(e);
+                user.deactivate().then(() => user.delete().then(() => {
+                  client.deleteGroup(group.id).then(() => {
+                    res.status(500).send("User couldn't be added to group. Full error: " + e);
+                  })
+                }))
+              }
+              catch (e) {
+                res.status(500).send("Unknown error: " + e);
+              }
             });
 
-
-
-
-
-
-
+        }).catch(e => {
+          try {
+            console.error(e);
+            user.deactivate().then(() => user.delete().then(() => {
+              res.status(500).send("Group couldn't be created (Probably already exists). Full error: " + e);
+            }))
+          }
+          catch (e) {
+            res.status(500).send("Unknown error: " + e);
+          }
         });
+    }).catch(e => {
+      res.status(500).send("User couldn't be created (Probably already exists). Full error: " + e);
     });
 
 })
