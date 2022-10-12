@@ -62,7 +62,7 @@ app.get("/signup", (req, res) => {
                   "oauthClient": {
                     "client_uri": "http://localhost:8080",
                     "redirect_uris": [
-                      "https://" + req.query.tenant + "." + (req.query.region || "us") + ".auth0.com/login/callback"
+                      "https://" + req.query.tenant + "." + (req.query.region || "eu") + ".auth0.com/login/callback"
                     ],
                     "response_types": [
                       "id_token"
