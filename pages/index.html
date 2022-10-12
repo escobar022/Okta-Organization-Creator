@@ -54,8 +54,9 @@
         information below and click submit to create your directory!</p>
     <section id="input">
         <input id="tenant" type="text" placeholder="Auth0 Tenant Name">
+        <input id="region" type="text" placeholder="Region">
         <p class="help">This is the name you have specified when you created your Auth0 tenant. You can find it when
-            navigating to manage.auth0.com under manage.auth0.com/dashboard/eu/<b>tenant-name</b></p>
+            navigating to manage.auth0.com under manage.auth0.com/dashboard/<b>region</b>/<b>tenant-name</b></p>
         <input id="org" type="text" placeholder="Organization Name (can be anything)">
         <input id="email" type="text" placeholder="Test Users Email address (can be any valid email address)">
         <input id="first" type="text" placeholder="Users first name (optional)">
@@ -87,6 +88,7 @@
     <script>
         function submit() {
             const tenant = document.querySelector("#tenant");
+            const region = document.querySelector("#region");
             const org = document.querySelector("#org");
             const email = document.querySelector("#email");
             const first = document.querySelector("#first");
@@ -95,6 +97,7 @@
             const inputForm = document.querySelector("#input");
 
             tenant.setAttribute("disabled", "true");
+            region.setAttribute("disabled", "true");
             org.setAttribute("disabled", "true");
             email.setAttribute("disabled", "true");
             first.setAttribute("disabled", "true");
@@ -102,7 +105,7 @@
             submitBtn.setAttribute("disabled", "true");
             submitBtn.innerHTML = "Creating organization...";
 
-            fetch(`/signup?tenant=${tenant.value}&organization=${org.value}&email=${email.value}&first=${first.value}&last=${last.value}`).then(res => {
+            fetch(`/signup?tenant=${tenant.value}&region=${region.value}&organization=${org.value}&email=${email.value}&first=${first.value}&last=${last.value}`).then(res => {
                 if (res.status === 200) {
                     res.json().then(data => {
                         document.querySelector("#errormsg").style.display = "none";
